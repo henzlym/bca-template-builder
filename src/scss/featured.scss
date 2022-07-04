@@ -1,0 +1,61 @@
+.wp-block-bca-template-builder {
+    .featured{
+        &.template-1{
+            @media screen and (min-width:768px) {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                grid-column-gap: 15px;
+                .bca-card{
+                    grid-column: 2/3;
+                    &:first-child{
+                        grid-column: 1/2;
+                        grid-row: span 5;
+                    }
+                    &:not(:first-child){
+                        display: grid;
+                        grid-template-columns: minmax(25%, auto) minmax(auto, 1fr);
+                        grid-column-gap: 5px;
+                        margin-bottom: 5px;
+                        .bca-card_categories{
+                            display: none;
+                        }
+                        .bca-card_title {
+                            font-size: 12px !important;
+                            line-height: 1.3;
+                            margin-bottom: 5px;
+                        }
+                        .bca-card_byline{
+                            font-size: 9px;
+                        }
+                    }
+                }
+            }
+        }
+        &.template-2{
+            @media screen and (min-width:768px) {
+                display: grid;
+                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-rows: 1fr;
+                grid-column-gap: 15px;
+                .bca-card{
+                    &:first-child{
+                        grid-column: 1/4;
+                    }
+                    &:not(:first-child){
+                        .bca-card_thumbnail_container {
+                            margin-bottom: 5px;
+                        }
+                        .bca-card_title {
+                            font-size: 12px !important;
+                            line-height: 1.3;
+                            margin-bottom: 5px;
+                        }
+                        .bca-card_byline{
+                            font-size: 9px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
