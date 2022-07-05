@@ -24,83 +24,9 @@ import {
     pullRight,
     alignNone
 } from '@wordpress/icons';
-const ImageSizeSelectControl = ({ size, setSize }) => {
 
-    const { imageSizes } = useSelect(
-        (select) => {
-            const { getSettings } = select('core/block-editor');
-            console.log(getSettings());
-            return pick(getSettings(), ['imageSizes']);
-        }
-    );
+import { ImageSizeSelectControl, FontSizeControl, PostAuthorControls } from '../components';
 
-    if (imageSizes.length == 0) {
-        return null;
-    }
-
-    const imageSizeOptions = imageSizes.map((size) => {
-        return { label: size.name, value: size.slug }
-    });
-
-    return (
-        <SelectControl
-            label="Image size"
-            value={size}
-            options={imageSizeOptions}
-            onChange={setSize}
-            __nextHasNoMarginBottom
-        />
-    );
-};
-const FontSizeControl = ({ value, fallbackFontSize = 16, onChange = null, withSlider = false, withReset = true }) => {
-
-    const { fontSizes } = useSelect(
-        (select) => {
-            const { getSettings } = select('core/block-editor');
-            console.log(getSettings());
-            return pick(getSettings(), ['fontSizes']);
-        }
-    );
-
-    if (fontSizes.length == 0) {
-        return null;
-    }
-
-
-    return (
-        <FontSizePicker
-            fontSizes={fontSizes}
-            value={value}
-            fallbackFontSize={fallbackFontSize}
-            onChange={onChange}
-            withSlider={withSlider}
-            withReset={withReset}
-        />
-    );
-};
-const PostAuthorControls = (props) => {
-    const { attributes: { postSettings }, setAttributes } = props;
-    return (
-        <Fragment>
-            <ToggleControl
-                label="Display author"
-                checked={postSettings.showAuthor}
-                onChange={(checked) => {
-                    setAttributes({ postSettings: { ...postSettings, showAuthor: checked } });
-                }}
-            />
-            {postSettings.showAuthor && (
-                <ToggleControl
-                    label="Display author icon"
-                    checked={postSettings.showAuthorIcon}
-                    onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showAuthorIcon: checked } });
-                    }}
-                />
-            )}
-        </Fragment>
-    )
-}
 export default function PostPanel({ attributes, setAttributes }) {
     const { layout, postSettings } = attributes;
     return (

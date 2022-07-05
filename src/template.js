@@ -1,8 +1,8 @@
 
-import Post from './post';
+import Post from './components/post';
 import PostIsLoading from './post-loading';
 
-export default function Template({ attributes, posts, isLoading }) {
+export default function Template({ attributes, posts, isLoading, setAttributes }) {
 
     const { columns, gridGap, layout, query:{per_page}, template, textAlignment } = attributes;
     
@@ -27,8 +27,8 @@ export default function Template({ attributes, posts, isLoading }) {
             style={{gridColumnGap:gridGap}}
         >
             {
-                posts.map( ( post ) => {
-                    return <Post { ...{attributes,post,isLoading} }/>
+                posts.map( ( post, index ) => {
+                    return <Post { ...{attributes,post,index,isLoading,setAttributes} }/>
                 })
             }
         </div>

@@ -5,15 +5,7 @@
  */
 
 @import './style.scss';
-@mixin is-loading {
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: #ddd;
-    z-index: 10;
-}
+@import './scss/mixins.scss';
 .wp-block-bca-template-builder{
     .bca-card.is-loading {
         > div{
@@ -33,6 +25,19 @@
             content: "";
             @include is-loading;
         }
+    }
+}
+.bca-card_modal{
+    .components-popover__content{
+        min-width: 400px;
+    }
+    .block-editor-link-control__search-item{
+        display: grid;
+        grid-template-columns: minmax(80px, auto) minmax(auto, 1fr);
+        grid-column-gap: 10px;
+    }
+    .block-editor-link-control__search-item-thumbnail{
+        @include aspect-ratio;
     }
 }
 

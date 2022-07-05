@@ -26,6 +26,10 @@
         "titleFontSize": "22px"
       }
     },
+    "posts": {
+      "type": "array",
+      "default": []
+    },
     "query": {
       "type": "object",
       "default": {

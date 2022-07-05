@@ -1,0 +1,22 @@
+@mixin is-loading {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: #ddd;
+    z-index: 10;
+}
+@mixin aspect-ratio {
+    position: relative;
+    height: 0;
+    padding-bottom: 56.25%;
+    > img{
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+}

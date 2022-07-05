@@ -10,7 +10,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import './editor.scss';
-import { PanelLayout, PanelPost, PanelQuery } from './components';
+import { PanelLayout, PanelPost, PanelQuery } from './panels';
 /**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.

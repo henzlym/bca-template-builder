@@ -25,7 +25,7 @@ import {
 import {
     filter
 } from '@wordpress/icons';
-import { TermsControl } from '.';
+import { TermsControl } from '../components';
 
 const orderOptions = [
 	{

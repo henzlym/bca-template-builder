@@ -21,9 +21,7 @@ import Template from './template';
  *
  * @return {WPElement} Element to render.
  */
-export default function PostQuery(props) {
-
-    const { attributes } = props;
+export default function PostQuery({attributes, setAttributes}) {
     const { query:{ categories, _embed, per_page, tags, types, order, orderby } = {} } = attributes;
     const [ posts, setPosts ] = useState(null);
     const [ isLoading, setIsLoading ] = useState('is-loading');
@@ -61,7 +59,7 @@ export default function PostQuery(props) {
     ]);
 
     return (
-        <Template { ...{attributes,posts,isLoading} } />
+        <Template { ...{attributes,posts,isLoading,setAttributes} } />
 
     );
 }
