@@ -41,7 +41,23 @@
     }
 }
 
-
+.bca-card_dropdown{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 5;
+    .components-button svg{
+        color: #1e1e1e;
+    }
+}
+.list.template-1{
+    .bca-card.left{
+        .bca-card_dropdown{
+            left: 0;
+            right: initial;
+        }
+    }
+}
 .bca-template-select-control{
     .components-button-group{
         display: grid;

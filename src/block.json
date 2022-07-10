@@ -61,6 +61,10 @@
 			"default":""
 		}
 	},
+	"providesContext": {
+		"bca-template-builder/query": "query",
+		"bca-template-builder/postSettings": "postSettings"
+	},
 	"supports": {
 		"anchor":true,
 		"align": true,

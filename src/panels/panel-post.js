@@ -1,20 +1,11 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-import { Fragment } from 'react';
-
-/**
  * Wordpress dependecies.
  *
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import {
-    FontSizePicker,
     Panel,
     PanelBody,
-    SelectControl,
     ToggleControl,
     __experimentalToggleGroupControl as ToggleGroupControl,
     __experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon
@@ -54,7 +45,7 @@ export default function PostPanel({ attributes, setAttributes }) {
                 )}
 
                 <ImageSizeSelectControl
-                    value={postSettings.thumbnailSize}
+                    size={postSettings.thumbnailSize}
                     setSize={(newSize) => {
                         setAttributes({ postSettings: { ...postSettings, thumbnailSize: newSize } })
                     }}

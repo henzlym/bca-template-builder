@@ -1,0 +1,82 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 2,
+  "name": "bca/post-card",
+  "version": "0.1.0",
+  "title": "Post Card",
+  "category": "widgets",
+  "icon": "layout",
+  "description": "Select post card.",
+  "attributes": {
+    "categorySettings": {
+      "type": "object",
+      "default": {
+        "show": true
+      }
+    },
+    "excerptSettings": {
+      "type": "object",
+      "default": {
+        "show": true
+      }
+    },
+    "edits": {
+      "type": "object",
+      "default": {}
+    },
+    "index": {
+      "type": "number"
+    },
+    "metaSettings": {
+      "type": "object",
+      "default": {
+        "author": {
+          "show": true,
+          "showIcon": false
+        },
+        "date": {
+          "showDate": true
+        }
+      }
+    },
+    "titleFontSize": {
+      "type": "string",
+      "default": "22px"
+    },
+    "thumbnailSettings": {
+      "type": "object",
+      "default": {
+        "show": true,
+        "alignment": "",
+        "size": "thumbnail"
+      }
+    }
+  },
+  "supports": {
+    "anchor": true,
+    "align": true,
+    "className": true,
+    "color": {
+      "background": true,
+      "link": true,
+      "text": true
+    },
+    "html": false,
+    "spacing": {
+      "margin": true,
+      "padding": true,
+      "blockGap": true
+    }
+  },
+  "usesContext": [
+    "bca-template-builder/query",
+    "bca-template-builder/postSettings",
+    "posts",
+    "isLoading",
+    "layout"
+  ],
+  "textdomain": "bca-post-card",
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": "file:./style-index.css"
+}

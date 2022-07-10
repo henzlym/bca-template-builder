@@ -9,8 +9,15 @@ import { dateI18n } from '@wordpress/date';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Animate } from '@wordpress/components';
 import { Fragment, useCallback } from 'react';
-import { PostEdit } from '../components';
-import { getAuthor, getThumbnail, getCategories } from '../helpers'
+// import { PostEdit } from '../components';
+import {
+    BlockContextProvider,
+    useBlockProps,
+    useInnerBlocksProps
+} from '@wordpress/block-editor';
+import { InspectorControls } from '@wordpress/block-editor';
+import { getAuthor, getThumbnail, getCategories } from '../../helpers';
+import PostPanel from './inspector';
 /**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.
@@ -19,10 +26,24 @@ import { getAuthor, getThumbnail, getCategories } from '../helpers'
  *
  * @return {WPElement} Element to render.
  */
-export default function Post({ attributes, index, isLoading, post:initialPost, setAttributes }) {
+export default function Edit({ attributes, context, setAttributes }) {
+    const {
+        categorySettings,
+        excerptSettings,
+        edits,
+        index,
+        metaSettings,
+        thumbnailSettings,
+        titleFontSize
+    } = attributes;
+    const { 
+        "bca-template-builder/query":query,
+        isLoading, 
+        posts,
+        layout
+    } = context;
     const isInitialMount = useRef(true);
-    const [post, setPost] = useState(initialPost);
-    const { posts, postSettings } = attributes;
+    const [post, setPost] = useState(posts[index]);
     const {
         date,
         id,
@@ -32,14 +53,9 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
     const [isImageLoaded, setIsImageLoaded] = useState(false);
 
     const thumbnail = useMemo(() => {
-        let editedPost = posts.filter( post => post.index == index );
-        let selectedThumbnailSize = postSettings.thumbnailSize;
-        if (editedPost.length>0) {
-            selectedThumbnailSize = editedPost[0].thumbnailSize;
-        }
-        console.log(selectedThumbnailSize);
+        let selectedThumbnailSize = thumbnailSettings.size;
         return getThumbnail(post, selectedThumbnailSize);
-    }, [postSettings.thumbnailSize, post.thumbnailSize, postSettings.showThumbnail]);
+    }, [thumbnailSettings.size]);
     const author = useMemo(() => {
         return getAuthor(post);
     }, [post.author]);
@@ -56,35 +72,40 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
         return document.body.textContent || document.body.innerText || '';
     }, [excerpt]);
 
-    useEffect(()=>{
+    // useEffect(() => {
 
-        let editedPost = posts.filter( post => post.index == index );
-        if ( editedPost.length > 0 ) {
-            editedPost = editedPost[0];
-            setPost( { ...post,...editedPost  } );
-        }
+    //     let editedPost = posts.filter(post => post.index == index);
+    //     if (editedPost.length > 0) {
+    //         editedPost = editedPost[0];
+    //         setPost({ ...post, ...editedPost });
+    //     }
 
-        if (isInitialMount.current) {
-            isInitialMount.current = false;
-            return;
-        }
+    //     if (isInitialMount.current) {
+    //         isInitialMount.current = false;
+    //         return;
+    //     }
 
 
-    },[title,post.thumbnailSize]);
+    // }, [title, post.thumbnailSize]);
 
-    if (index==0) {
+    if (index == 0) {
         console.log(post);
-       
     }
+
+    let blockProps = useBlockProps({
+        className:`bca-card ${thumbnailSettings.alignment} ${isLoading ? 'is-loading' : ''}`
+    });
     return (
-        <div className={`bca-card ${postSettings.thumbnailAlignment} ${isLoading ? 'is-loading' : ''}`}>
+        <div {...blockProps}>
 
-            <PostEdit {...{ post, index, attributes, setAttributes, setPost }}/>
-
+            <PostEdit {...{ attributes, setAttributes }} />
+            <InspectorControls>
+                <PostPanel {...{ attributes, setAttributes, context }} />
+            </InspectorControls>
             <Animate type={`${!isImageLoaded || isLoading ? 'loading' : ''}`}>
                 {({ className }) => (
                     <Fragment>
-                        {thumbnail && postSettings.showThumbnail && (
+                        {thumbnail && thumbnailSettings.show && (
                             <div className={`bca-card_thumbnail_container ${!isImageLoaded ? 'is-loading' : ''} ${className}`}>
                                 <img className={`bca-card_thumbnail`} src={thumbnail} onLoad={(e) => {
                                     setIsImageLoaded(true)
@@ -102,7 +123,7 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
 
                         {!isLoading && (
                             <Fragment>
-                                {categories && postSettings.showCategories && (
+                                {categories && categorySettings.show && (
                                     <span className='bca-card_categories'>
                                         {
                                             categories.map((category) => {
@@ -111,26 +132,26 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
                                         }
                                     </span>
                                 )}
-                                <h2 className='bca-card_title' style={{ fontSize: postSettings.titleFontSize }}>{title}</h2>
+                                <h2 className='bca-card_title' style={{ fontSize: titleFontSize }}>{title}</h2>
                                 <div className='bca-card_byline stacked'>
-                                    {author !== false && postSettings.showAuthor && (
+                                    {author !== false && metaSettings.author.show && (
                                         <address className='bca-card_author'>
-                                            {!postSettings.showAuthorIcon && (
+                                            {!metaSettings.author.showIcon && (
                                                 <span className='bca-card_author_prefix'>By</span>
                                             )}
                                             <a href={author.link} rel="author">
-                                                {postSettings.showAuthorIcon && (
+                                                {metaSettings.author.showIcon && (
                                                     <img className='bca-card_author_avatar' src={author.avatar} />
                                                 )}
                                                 <span className='bca-card_author_name'>{author.name}</span>
                                             </a>
                                         </address>
                                     )}
-                                    {postSettings.showDate && (
+                                    {metaSettings.date.show && (
                                         <time>{dateI18n('F j, Y', date)}</time>
                                     )}
                                 </div>
-                                {postSettings.showExcerpt && (
+                                {excerptSettings.show && (
                                     <div className='bca-card_excerpt'>{strippedExcerpt}</div>
                                 )}
                             </Fragment>

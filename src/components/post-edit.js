@@ -4,13 +4,18 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useDebounce } from '@wordpress/compose';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { dateI18n } from '@wordpress/date';
 import {
     Button,
     Dropdown,
     TextControl
 } from '@wordpress/components';
+import {
+    edit,
+    pullRight,
+    alignNone
+} from '@wordpress/icons';
 import { getThumbnail, restApiFetch } from '../helpers';
 import { ImageSizeSelectControl } from '../components';
 import { Fragment } from 'react';
@@ -47,44 +52,36 @@ function PostSearchResults({ posts }) {
         )
     });
 }
-export default function PostEdit({ post, index, attributes, setAttributes }) {
-    const [Post, setPost] = useState(false);
+export default function PostEdit({ post, index, attributes, setAttributes, setPost }) {
     const {
         date,
         excerpt: { rendered: excerpt },
-        title: { raw: title }
-    } = Post;
-    const { posts } = attributes;
-    const updatePost = ( update ) => {
-        console.log(Post);
-        console.log(update);
-        console.log({...Post, update});
-        // setPost( { Post:{...Post, update} } )
-    }
-
-    useEffect(
-        () => {
-            console.log(Post);
-
-            // let updatedPost = {
-            //     id:Post.id,
-            //     index:index,
-            //     title:title
-            // }
-
-            // let postExists = posts.filter( post => post.index == index );
-            // if ( postExists.length == 0 ) {
-            //     posts.push( updatedPost )
-            //     setAttributes( { posts:[ ...posts ] } );
-                
-            // } else {
-            //     let currentPost = posts.filter( selectedPost => selectedPost.index !== index );
-            //     currentPost.push( updatedPost )
-            //     setAttributes( { posts:[ ...currentPost ] } );
-            // }
+        title: { raw: title, rendered }
+    } = post;
+    const { posts, postSettings } = attributes;
     
-        },[title]
-    )
+    const updatePost = ( update ) => {
+        let updatedPost = {
+            id:post.id,
+            index:index,
+            ...update
+        }
+
+        let postExists = posts.filter( post => post.index == index );
+        if ( postExists.length == 0 ) {
+            posts.push( updatedPost )
+            setAttributes( { posts:[ ...posts ] } );
+            
+        } else {
+            let currentPost = posts.filter( selectedPost => selectedPost.index !== index );
+            currentPost.push( {...postExists[0],...updatedPost} )
+            setAttributes( { posts:[ ...currentPost ] } );
+        }
+
+        setPost( {...post, ...update} );
+    }
+    const hasSelectedThumbnailSize = typeof post.thumbnailSize !== 'undefined' ? post.thumbnailSize : postSettings.thumbnailSize;
+
     return (
         <Fragment>
             <Dropdown
@@ -94,11 +91,14 @@ export default function PostEdit({ post, index, attributes, setAttributes }) {
                 position="top right"
                 renderToggle={({ isOpen, onToggle }) => (
                     <Button
-                        variant="primary"
+                        className='bca-card_edit'
+                        isSmall={true}
+                        variant="tertiary"
                         onClick={onToggle}
+                        showTooltip={true}
                         aria-expanded={isOpen}
+                        icon={ edit } label={ 'Edit' } iconSize={ 24 } 
                     >
-                        Edit
                     </Button>
                 )}
                 renderContent={() => {
@@ -107,14 +107,14 @@ export default function PostEdit({ post, index, attributes, setAttributes }) {
                             <TextControl
                                 label="Title"
                                 value={ title }
-                                onChange={ ( title ) => { updatePost( {title:title} ) } }
+                                onChange={ ( title ) => { updatePost( {title:{raw:title,rendered}} ) } }
                             />
-                            {/* <ImageSizeSelectControl 
-                                value={postSettings.thumbnailSize}
+                            <ImageSizeSelectControl 
+                                size={hasSelectedThumbnailSize}
                                 setSize={(newSize) => {
-                                    setAttributes({ postSettings: { ...postSettings, thumbnailSize: newSize } })
+                                    updatePost( {thumbnailSize:newSize} )
                                 }}
-                            /> */}
+                            />
                         </Fragment>
                     )
                 }}

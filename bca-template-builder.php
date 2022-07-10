@@ -13,6 +13,8 @@
  * @package           create-block
  */
 
+// Include Neset Blocks
+// require_once plugin_dir_path(__FILE__) . './src/blocks/post-card/index.php';
 /**
  * Registers the block using the metadata loaded from the `block.json` file.
  * Behind the scenes, it registers also all assets so they can be enqueued

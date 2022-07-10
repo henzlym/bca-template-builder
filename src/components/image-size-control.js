@@ -18,7 +18,6 @@ export default function ImageSizeSelectControl({ size, setSize }) {
     const { imageSizes } = useSelect(
         (select) => {
             const { getSettings } = select('core/block-editor');
-            console.log(getSettings());
             return pick(getSettings(), ['imageSizes']);
         }
     );
@@ -27,8 +26,8 @@ export default function ImageSizeSelectControl({ size, setSize }) {
         return null;
     }
 
-    const imageSizeOptions = imageSizes.map((size) => {
-        return { label: size.name, value: size.slug }
+    const imageSizeOptions = imageSizes.map((imageSize) => {
+        return { label: imageSize.name, value: imageSize.slug }
     });
 
     return (
@@ -46,7 +45,6 @@ const FontSizeControl = ({ value, fallbackFontSize = 16, onChange = null, withSl
     const { fontSizes } = useSelect(
         (select) => {
             const { getSettings } = select('core/block-editor');
-            console.log(getSettings());
             return pick(getSettings(), ['fontSizes']);
         }
     );
