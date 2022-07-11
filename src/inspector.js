@@ -20,11 +20,18 @@ import { PanelLayout, PanelPost, PanelQuery } from './panels';
  * @return {WPElement} Element to render.
  */
 export default function Inspector({ attributes, setAttributes }) {
+    const {
+        layout,
+        postSettings,
+    } = attributes;
+
     return (
         <InspectorControls key="setting">
             <PanelLayout {...{ attributes, setAttributes }} />
             <PanelQuery {...{ attributes, setAttributes }} />
-            <PanelPost {...{ attributes, setAttributes }} />
+            <PanelPost {...{ layout, postSettings }} onChange={ (value) => {
+                setAttributes({ postSettings:{...postSettings,...value}})
+            }} />
         </InspectorControls>
     );
 }

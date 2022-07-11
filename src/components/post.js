@@ -37,7 +37,7 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
         if (editedPost.length>0) {
             selectedThumbnailSize = editedPost[0].thumbnailSize;
         }
-        console.log(selectedThumbnailSize);
+        // console.log(selectedThumbnailSize);
         return getThumbnail(post, selectedThumbnailSize);
     }, [postSettings.thumbnailSize, post.thumbnailSize, postSettings.showThumbnail]);
     const author = useMemo(() => {
@@ -56,6 +56,27 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
         return document.body.textContent || document.body.innerText || '';
     }, [excerpt]);
 
+    const updatePost = ( update ) => {
+        let updatedPost = {
+            id:post.id,
+            index:index,
+            ...update
+        }
+
+        let postExists = posts.filter( post => post.index == index );
+        if ( postExists.length == 0 ) {
+            posts.push( updatedPost )
+            setAttributes( { posts:[ ...posts ] } );
+            
+        } else {
+            let currentPost = posts.filter( selectedPost => selectedPost.index !== index );
+            currentPost.push( {...postExists[0],...updatedPost} )
+            setAttributes( { posts:[ ...currentPost ] } );
+        }
+
+        setPost( {...post, ...update} );
+    }
+
     useEffect(()=>{
 
         let editedPost = posts.filter( post => post.index == index );
@@ -73,13 +94,13 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
     },[title,post.thumbnailSize]);
 
     if (index==0) {
-        console.log(post);
+        // console.log(post);
        
     }
     return (
         <div className={`bca-card ${postSettings.thumbnailAlignment} ${isLoading ? 'is-loading' : ''}`}>
 
-            <PostEdit {...{ post, index, attributes, setAttributes, setPost }}/>
+            <PostEdit {...{ title, thumbnailSize, updatePost }}/>
 
             <Animate type={`${!isImageLoaded || isLoading ? 'loading' : ''}`}>
                 {({ className }) => (

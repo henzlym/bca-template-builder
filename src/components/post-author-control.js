@@ -9,23 +9,23 @@ import { Fragment } from 'react';
  */
 import { __ } from '@wordpress/i18n';
 import { ToggleControl } from '@wordpress/components';
-export default function PostAuthorControls(props) {
-    const { attributes: { postSettings }, setAttributes } = props;
+export default function PostAuthorControls({postSettings, onChange}) {
+    const { metaSettings } = postSettings
     return (
         <Fragment>
             <ToggleControl
                 label="Display author"
-                checked={postSettings.showAuthor}
+                checked={metaSettings.author.show}
                 onChange={(checked) => {
-                    setAttributes({ postSettings: { ...postSettings, showAuthor: checked } });
+                    onChange({ metaSettings:{...metaSettings,author:{...metaSettings.author,show:checked}} });
                 }}
             />
-            {postSettings.showAuthor && (
+            {metaSettings.author.show && (
                 <ToggleControl
                     label="Display author icon"
-                    checked={postSettings.showAuthorIcon}
+                    checked={metaSettings.author.showIcon}
                     onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showAuthorIcon: checked } });
+                        onChange({ metaSettings:{...metaSettings,author:{...metaSettings.author,showIcon:checked}} });
                     }}
                 />
             )}

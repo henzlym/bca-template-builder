@@ -52,36 +52,8 @@ function PostSearchResults({ posts }) {
         )
     });
 }
-export default function PostEdit({ post, index, attributes, setAttributes, setPost }) {
-    const {
-        date,
-        excerpt: { rendered: excerpt },
-        title: { raw: title, rendered }
-    } = post;
-    const { posts, postSettings } = attributes;
+export default function PostEdit({ title, thumbnailSize, updatePost }) {
     
-    const updatePost = ( update ) => {
-        let updatedPost = {
-            id:post.id,
-            index:index,
-            ...update
-        }
-
-        let postExists = posts.filter( post => post.index == index );
-        if ( postExists.length == 0 ) {
-            posts.push( updatedPost )
-            setAttributes( { posts:[ ...posts ] } );
-            
-        } else {
-            let currentPost = posts.filter( selectedPost => selectedPost.index !== index );
-            currentPost.push( {...postExists[0],...updatedPost} )
-            setAttributes( { posts:[ ...currentPost ] } );
-        }
-
-        setPost( {...post, ...update} );
-    }
-    const hasSelectedThumbnailSize = typeof post.thumbnailSize !== 'undefined' ? post.thumbnailSize : postSettings.thumbnailSize;
-
     return (
         <Fragment>
             <Dropdown
@@ -107,12 +79,12 @@ export default function PostEdit({ post, index, attributes, setAttributes, setPo
                             <TextControl
                                 label="Title"
                                 value={ title }
-                                onChange={ ( title ) => { updatePost( {title:{raw:title,rendered}} ) } }
+                                onChange={ ( title ) => { updatePost( 'title', title ) } }
                             />
                             <ImageSizeSelectControl 
-                                size={hasSelectedThumbnailSize}
+                                size={thumbnailSize}
                                 setSize={(newSize) => {
-                                    updatePost( {thumbnailSize:newSize} )
+                                    updatePost( 'thumbnailSize', newSize )
                                 }}
                             />
                         </Fragment>

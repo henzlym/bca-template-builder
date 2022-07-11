@@ -15,15 +15,30 @@
     "postSettings": {
       "type": "object",
       "default": {
-        "showThumbnail": true,
-        "thumbnailAlignment": "",
-        "thumbnailSize": "thumbnail",
-        "showAuthor": true,
-        "showAuthorIcon": false,
-        "showDate": true,
-        "showExcerpt": false,
-        "showCategories": false,
-        "titleFontSize": "22px"
+        "categorySettings": {
+          "show": true
+        },
+        "excerptSettings": {
+          "show": true
+        },
+        "metaSettings": {
+          "author": {
+            "show": true,
+            "showIcon": false
+          },
+          "date": {
+            "show": true
+          }
+        },
+        "titleSettings": {
+          "fontSize": "22px",
+          "title": ""
+        },
+        "thumbnailSettings": {
+          "show": true,
+          "alignment": "",
+          "size": "thumbnail"
+        }
       }
     },
     "posts": {

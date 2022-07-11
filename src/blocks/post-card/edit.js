@@ -6,10 +6,10 @@
 import { __ } from '@wordpress/i18n';
 import { get } from 'lodash';
 import { dateI18n } from '@wordpress/date';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { Animate } from '@wordpress/components';
-import { Fragment, useCallback } from 'react';
-// import { PostEdit } from '../components';
+import { Fragment } from 'react';
+import { PostEdit } from '../../components';
 import {
     BlockContextProvider,
     useBlockProps,
@@ -17,7 +17,7 @@ import {
 } from '@wordpress/block-editor';
 import { InspectorControls } from '@wordpress/block-editor';
 import { getAuthor, getThumbnail, getCategories } from '../../helpers';
-import PostPanel from './inspector';
+import Inspector from './inspector';
 /**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.
@@ -27,21 +27,24 @@ import PostPanel from './inspector';
  * @return {WPElement} Element to render.
  */
 export default function Edit({ attributes, context, setAttributes }) {
-    const {
-        categorySettings,
-        excerptSettings,
-        edits,
-        index,
-        metaSettings,
-        thumbnailSettings,
-        titleFontSize
-    } = attributes;
     const { 
         "bca-template-builder/query":query,
+        "bca-template-builder/postSettings":templatePostSettings,
         isLoading, 
         posts,
         layout
     } = context;
+    const {
+        edits,
+        index,
+    } = attributes;
+    let {
+        categorySettings,
+        excerptSettings,
+        metaSettings,
+        thumbnailSettings,
+        titleSettings
+    } = templatePostSettings;
     const isInitialMount = useRef(true);
     const [post, setPost] = useState(posts[index]);
     const {
@@ -51,6 +54,13 @@ export default function Edit({ attributes, context, setAttributes }) {
         title: { raw: title }
     } = post;
     const [isImageLoaded, setIsImageLoaded] = useState(false);
+    
+    const postTitle = useMemo(() => {
+        if (titleSettings.title) {
+            return titleSettings.title;
+        }
+        return title;
+    }, [titleSettings.title]);
 
     const thumbnail = useMemo(() => {
         let selectedThumbnailSize = thumbnailSettings.size;
@@ -72,6 +82,27 @@ export default function Edit({ attributes, context, setAttributes }) {
         return document.body.textContent || document.body.innerText || '';
     }, [excerpt]);
 
+    let postSettings = useMemo( () => {
+        return{
+            thumbnailSettings:attributes.thumbnailSettings,
+            metaSettings:attributes.metaSettings,
+            excerptSettings:attributes.excerptSettings,
+            categorySettings:attributes.categorySettings,
+            titleSettings:attributes.titleSettings.fontSize
+        }
+    }, [
+        attributes.thumbnailSettings.show,
+        thumbnailSettings.alignment,
+        thumbnailSettings.size,
+        metaSettings.author.show,
+        metaSettings.author.showIcon,
+        metaSettings.date.show,
+        excerptSettings.show,
+        categorySettings.show,
+        titleSettings.fontSize
+    ]);
+
+    postSettings = {...templatePostSettings, ...postSettings};
     // useEffect(() => {
 
     //     let editedPost = posts.filter(post => post.index == index);
@@ -89,7 +120,8 @@ export default function Edit({ attributes, context, setAttributes }) {
     // }, [title, post.thumbnailSize]);
 
     if (index == 0) {
-        console.log(post);
+        // console.log(post);
+        // console.log(postSettings);
     }
 
     let blockProps = useBlockProps({
@@ -98,9 +130,20 @@ export default function Edit({ attributes, context, setAttributes }) {
     return (
         <div {...blockProps}>
 
-            <PostEdit {...{ attributes, setAttributes }} />
+            <PostEdit
+                postSettings={postSettings}
+                onChange={ ( value, settings ) => {
+                    setAttributes(value);
+                }}
+            />
             <InspectorControls>
-                <PostPanel {...{ attributes, setAttributes, context }} />
+                <Inspector
+                    layout={layout}
+                    postSettings={postSettings}
+                    onChange={ (value, settings) => {
+                        setAttributes(value);
+                    }}
+                />
             </InspectorControls>
             <Animate type={`${!isImageLoaded || isLoading ? 'loading' : ''}`}>
                 {({ className }) => (
@@ -132,7 +175,7 @@ export default function Edit({ attributes, context, setAttributes }) {
                                         }
                                     </span>
                                 )}
-                                <h2 className='bca-card_title' style={{ fontSize: titleFontSize }}>{title}</h2>
+                                <h2 className='bca-card_title' style={{ fontSize: titleSettings.fontSize }}>{postTitle}</h2>
                                 <div className='bca-card_byline stacked'>
                                     {author !== false && metaSettings.author.show && (
                                         <address className='bca-card_author'>

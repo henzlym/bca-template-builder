@@ -36,14 +36,17 @@
                     "showIcon":false
                 },
                 "date":{
-                    "showDate":true
+                    "show":true
                 }
             }
         },
-		"titleFontSize":{
-            "type":"string",
-            "default":"22px"
-        },
+		"titleSettings":{
+			"type":"object",
+            "default":{
+				"fontSize":"22px",
+				"title":""
+			}
+		},
         "thumbnailSettings":{
             "type":"object",
             "default":{

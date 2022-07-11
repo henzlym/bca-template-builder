@@ -1,0 +1,43 @@
+@import '../../scss/mixins.scss';
+.bca-card.is-loading {
+    > div{
+        position: relative;
+        &.bca-card_headline:empty{
+            padding-bottom: 10%;
+        }
+        &::after {
+            content: "";
+            @include is-loading;
+        }
+    }
+}
+.bca-card_thumbnail_container.is-loading{
+    position: relative;
+    &::after {
+        content: "";
+        @include is-loading;
+    }
+}
+.bca-card_modal{
+    .components-popover__content{
+        min-width: 400px;
+    }
+    .block-editor-link-control__search-item{
+        display: grid;
+        grid-template-columns: minmax(80px, auto) minmax(auto, 1fr);
+        grid-column-gap: 10px;
+    }
+    .block-editor-link-control__search-item-thumbnail{
+        @include aspect-ratio;
+    }
+}
+
+.bca-card_dropdown{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 5;
+    .components-button svg{
+        color: #1e1e1e;
+    }
+}

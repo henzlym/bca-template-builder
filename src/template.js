@@ -27,7 +27,7 @@ function Posts({ className, style, Template }) {
 
 export default function Template({ attributes, posts, isLoading, setAttributes }) {
 
-    const { columns, gridGap, layout, query: { per_page }, template, textAlignment } = attributes;
+    const { columns, gridGap, layout, postSettings, query: { per_page }, template, textAlignment } = attributes;
 
     if (posts == null) {
         return (

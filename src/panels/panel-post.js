@@ -18,26 +18,26 @@ import {
 
 import { ImageSizeSelectControl, FontSizeControl, PostAuthorControls } from '../components';
 
-export default function PostPanel({ attributes, setAttributes }) {
-    const { layout, postSettings } = attributes;
+export default function PostPanel({layout, postSettings, onChange}) {
+    const { categorySettings, excerptSettings, metaSettings, titleSettings, thumbnailSettings } = postSettings
     return (
         <Panel>
             <PanelBody title="Post thumbnail settings:" initialOpen={false} >
                 <ToggleControl
                     label="Show post thumbnail"
-                    checked={postSettings.showThumbnail}
-                    onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showThumbnail: checked } });
+                    checked={thumbnailSettings.show}
+                    onChange={(value) => {
+                        onChange({ thumbnailSettings:{...thumbnailSettings,...{show:value}} });
                     }}
                 />
 
                 {layout == 'list' && (
                     <ToggleGroupControl
                         label={'Thumbnail alignment'}
-                        onChange={(alignment) => {
-                            setAttributes({ postSettings: { ...postSettings, thumbnailAlignment: alignment } })
+                        onChange={(value) => {
+                            onChange({ thumbnailSettings:{...thumbnailSettings,...{alignment:value}} });
                         }}
-                        value={postSettings.thumbnailAlignment}>
+                        value={thumbnailSettings.alignment}>
                         <ToggleGroupControlOptionIcon value="left" aria-label="Left" icon={pullLeft} showTooltip={true} />
                         <ToggleGroupControlOptionIcon value="" aria-label="None" icon={alignNone} showTooltip={true} />
                         <ToggleGroupControlOptionIcon value="right" aria-label="Right" icon={pullRight} showTooltip={true} />
@@ -45,18 +45,18 @@ export default function PostPanel({ attributes, setAttributes }) {
                 )}
 
                 <ImageSizeSelectControl
-                    size={postSettings.thumbnailSize}
-                    setSize={(newSize) => {
-                        setAttributes({ postSettings: { ...postSettings, thumbnailSize: newSize } })
+                    size={thumbnailSettings.size}
+                    setSize={(value) => {
+                        onChange({ thumbnailSettings:{...thumbnailSettings,...{size:value}} });
                     }}
                 />
             </PanelBody>
             <PanelBody title="Post title settings:" initialOpen={false}>
                 <FontSizeControl
-                    value={postSettings.titleFontSize}
+                    value={titleSettings.fontSize}
                     fallbackFontSize={22}
-                    onChange={(fontSize) => {
-                        setAttributes({ postSettings: { ...postSettings, titleFontSize: fontSize } });
+                    onChange={(value) => {
+                        onChange({ titleSettings:{...titleSettings,...{fontSize:value}} });
                     }}
                     withSlider={false}
                     withReset={true}
@@ -65,26 +65,26 @@ export default function PostPanel({ attributes, setAttributes }) {
             <PanelBody title="Post content settings:" initialOpen={false}>
                 <ToggleControl
                     label="Display excerpt"
-                    checked={postSettings.showExcerpt}
-                    onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showExcerpt: checked } });
+                    checked={excerptSettings.show}
+                    onChange={(value) => {
+                        onChange({ excerptSettings:{...excerptSettings,...{show:value}} });
                     }}
                 />
             </PanelBody>
             <PanelBody title="Post meta settings:" initialOpen={false}>
-                <PostAuthorControls {...{ attributes, setAttributes }} />
+                <PostAuthorControls {...{ postSettings, onChange }} />
                 <ToggleControl
                     label="Display date"
-                    checked={postSettings.showDate}
-                    onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showDate: checked } });
+                    checked={metaSettings.date.show}
+                    onChange={(value) => {
+                        onChange({ metaSettings:{...metaSettings,date:{show:value}} });
                     }}
                 />
                 <ToggleControl
                     label="Display categories"
-                    checked={postSettings.showCategories}
-                    onChange={(checked) => {
-                        setAttributes({ postSettings: { ...postSettings, showCategories: checked } });
+                    checked={categorySettings.show}
+                    onChange={(value) => {
+                        onChange({ categorySettings:{...categorySettings,...{show:value}} });
                     }}
                 />
             </PanelBody>
