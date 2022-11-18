@@ -67,10 +67,11 @@ function PostTypeSelectControl({ value, onChange }){
 			( { viewable, slug } ) =>
 				viewable && ! excludedPostTypes.includes( slug )
 		);
+        
 		return filteredPostTypes;
 	}, [] );
-
-    if (postTypes.length == 0) {
+console.log(postTypes);
+    if (!postTypes || postTypes.length == 0) {
         return null;
     }
 

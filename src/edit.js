@@ -25,6 +25,8 @@ import {
     alignNone
 } from '@wordpress/icons';
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { AsyncModeProvider, useDispatch, useSelect, dispatch, register, select } from '@wordpress/data';
+
 import { Fragment } from 'react';
 /**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
@@ -65,24 +67,13 @@ function PostEditToolbar() {
  */
 export default function Edit( props ) {
 	const [selectedPost, setSelectedPost] = useState(false);
-	const { attributes, setAttributes } = props;
+	const { attributes, clientId, setAttributes } = props;
 
 	return (
-		<Fragment>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ attributes.textAlignment }
-					onChange={ (align) => { setAttributes({ textAlignment: align}) } }
-				/>
-				{ selectedPost !== false && (
-					<PostEditToolbar />
-				)}
-			</BlockControls>
-			<Inspector { ...{attributes, setAttributes} }/>
-			<div { ...useBlockProps() }>
-				<PostQuery { ...{attributes, setAttributes} }/>
-			</div>
-		</Fragment>
+		<div { ...useBlockProps() }>
+            <Inspector { ...{attributes, clientId, setAttributes} } />
+            <PostQuery { ...{attributes, clientId, setAttributes} }/>
+        </div>
 
 	);
 }
