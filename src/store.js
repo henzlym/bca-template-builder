@@ -3,64 +3,69 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { createReduxStore, register, select, useSelect } from '@wordpress/data';
+import { createReduxStore, register, select, dispatch } from '@wordpress/data';
 import { store as core } from '@wordpress/core-data';
-
+import { arrayRemoveDuplicates } from './helpers'
 const DEFAULT_STATE = {
-    excludedPosts: {},
     posts: [],
-    queriedPosts: null,
+    blocks: {}
 };
 
 const actions = {
-    setPosts(posts) {
+    setPosts(id, posts, postIds) {
         return {
             type: 'SET_POSTS',
-            posts
+            id,
+            posts,
+            postIds
         };
     },
-    setQueriedPosts(queriedPosts) {
-        return {
-            type: 'SET_QUERIED_POSTS',
-            queriedPosts
+    deletePosts(id) {
+        const { blocks, posts } = select('bca/posts').getState();
+        
+        if (typeof blocks[id] == 'undefined') {
+            return;
         }
-    },
-    setExcludedPosts(id, posts) {
+
+        let updatedBlocks = { ...blocks };
+        let postsToDelete = updatedBlocks[id].map(post => post.id);
+        let updatedPosts = [...posts.filter(post => !postsToDelete.includes(post))];
+
+        delete updatedBlocks[id];
+
         return {
-            type: 'SET_EXCLUDED_POSTS',
-            id,
-            posts
+            type: 'DELETE_POSTS',
+            posts: updatedPosts,
+            blocks: updatedBlocks
         }
+
     },
-    fetchPosts(clientId, query) {
+    queryPosts(id, query) {
         return {
             type: 'FETCH_POSTS',
-            clientId,
+            id,
             query,
         };
     }
 };
 
-const store = createReduxStore('featured-posts', {
+const store = createReduxStore('bca/posts', {
     reducer(state = DEFAULT_STATE, action) {
         switch (action.type) {
             case 'SET_POSTS':
                 return {
                     ...state,
-                    posts: [...action.posts],
-                };
-            case 'SET_QUERIED_POSTS':
-                return {
-                    ...state,
-                    queriedPosts: [...action.queriedPosts],
-                };
-            case 'SET_EXCLUDED_POSTS':
-                return {
-                    ...state,
-                    excludedPosts: {
-                        ...state.excludedPosts,
-                        [action.id]: action.posts,
+                    posts: [...new Set([...state.posts, ...action.postIds])],
+                    blocks: {
+                        ...state.blocks,
+                        [action.id]: [...new Set( [...action.posts] ) ]
                     },
+                };
+            case 'DELETE_POSTS':
+                return {
+                    ...state,
+                    posts: [...action.posts],
+                    blocks: { ...action.blocks },
                 };
         }
 
@@ -73,36 +78,22 @@ const store = createReduxStore('featured-posts', {
         getState(state) {
             return state;
         },
-        getPosts(state) {
-            const { posts } = state;
+        getPosts(state, id) {
+            const posts = state.blocks[id] || [];
             return posts;
         },
         getQueriedPosts(state) {
-            const { queriedPosts } = state;
-            return queriedPosts;
+            return state.posts;
         },
-        getExcludedPosts(state, id) {
-            const excludedPosts = state.excludedPosts[id] || [];
-            return excludedPosts;
+        getBlocks(state){
+            return state.blocks
         }
     },
 
     controls: {
         FETCH_POSTS(action) {
 
-            const { categories, _embed, per_page, tags, types, order, orderby } = action.query;
-
-            const excludedPosts = select('featured-posts').getExcludedPosts(action.clientId)
-
-            const query = {
-                ...(categories.length > 0 && { categories: categories }),
-                ...(tags.length > 0 && { tags: tags }),
-                context: 'edit',
-                _embed,
-                per_page: excludedPosts.length + per_page,
-                order,
-                orderby,
-            }
+            const { query } = action;
 
             const path = addQueryArgs(
                 '/wp/v2/posts',
@@ -113,17 +104,59 @@ const store = createReduxStore('featured-posts', {
 
             const entities = apiFetch({ path });
 
-            return entities
+            return entities;
 
         }
     },
 
     resolvers: {
-        *getPosts(clientId, query) {
-            const posts = yield actions.fetchPosts(clientId, query);
-            return actions.setPosts(posts);
+        *getPosts(id, query) {
+            // const queriedPosts = yield select('bca/posts').getQueriedPosts() || [];
+            let postQuery = {...query};
+            let blocks = yield select('bca/posts').getBlocks();
+            let queriedPosts = [];
+            if( Object.keys(blocks).length ){
+                blocks = Object.entries(blocks).filter( ([clientId, posts]) => {
+                    if (id !== clientId) {
+                        console.log(clientId, posts);
+                        queriedPosts.push( ...posts.map( post => post.id ) );
+                    }
+                } );
+                postQuery.exclude = queriedPosts.length ? [...queriedPosts] : [];
+            }
+
+            
+            let posts = yield actions.queryPosts(id, postQuery);
+            let postIds = posts.length ? posts.map(post => post.id) : [];
+            
+
+            yield actions.setPosts(id, posts, postIds);
+            console.log(posts);
+            return posts;
         }
     },
 });
 
 register(store);
+
+let currentCount = wp.data.select('core/editor').getBlockCount();
+let unssubscribe = wp.data.subscribe( () => {
+    const { blocks } = select('bca/posts').getState();
+    let newCount = wp.data.select('core/editor').getBlockCount();
+    let removedBlocks = newCount < currentCount;
+    currentCount = newCount;
+    let removedBlocked = false;
+    
+    if (removedBlocks) {
+        let blockIds = Object.keys(blocks);
+        if (!removedBlocked) {
+            blockIds.forEach( id => {
+                let block = wp.data.select('core/editor').getBlocksByClientId(id);
+                if (block[0] == null) {
+                    dispatch('bca/posts').deletePosts(id);
+                }
+            });
+            removedBlocked = true;
+        }
+    }
+});

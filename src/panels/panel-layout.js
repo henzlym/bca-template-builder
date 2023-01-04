@@ -106,12 +106,30 @@ export default function PanelLayout({ attributes, setAttributes }) {
                         }
                         if (value !== 'list') {
                             newOptions.postSettings = {
-                                ...postSettings, thumbnailAlignment: ''
+                                ...postSettings, 
+                                thumbnailSettings: { 
+                                    ...postSettings.thumbnailSettings,
+                                    alignment: ''
+                                }    
                             }
                         }
                         if (value == 'list') {
                             newOptions.postSettings = {
-                                ...postSettings, thumbnailAlignment: 'left'
+                                ...postSettings, 
+                                thumbnailSettings: { 
+                                    ...postSettings.thumbnailSettings,
+                                    alignment: 'left'
+                                }    
+                            }
+                        }
+                        console.log(layout,value);
+                        if (layout=='list'&&value=='columns') {
+                            newOptions.postSettings = {
+                                ...postSettings, 
+                                thumbnailSettings: { 
+                                    ...postSettings.thumbnailSettings,
+                                    alignment: ''
+                                }    
                             }
                         }
                         setAttributes(newOptions)

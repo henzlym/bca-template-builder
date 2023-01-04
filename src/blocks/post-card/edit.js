@@ -4,20 +4,12 @@
  * @see https://developer.wordpress.org/block-editor/packages/packages-i18n/
  */
 import { __ } from '@wordpress/i18n';
-import { get } from 'lodash';
 import { dateI18n } from '@wordpress/date';
-import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { Animate } from '@wordpress/components';
 import { Fragment } from 'react';
-import { PostEdit } from '../../components';
-import {
-    BlockContextProvider,
-    useBlockProps,
-    useInnerBlocksProps
-} from '@wordpress/block-editor';
-import { InspectorControls } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 import { getAuthor, getThumbnail, getCategories } from '../../helpers';
-import Inspector from './inspector';
 /**
  * The edit function describes the structure of your block in the context of the
  * editor. This represents what the editor will render when the block is used.
@@ -26,16 +18,14 @@ import Inspector from './inspector';
  *
  * @return {WPElement} Element to render.
  */
-export default function Edit({ attributes, context, setAttributes }) {
+export default function Edit( props ) {
+    const { attributes, context } = props;
     const { 
-        "bca-template-builder/query":query,
         "bca-template-builder/postSettings":templatePostSettings,
         isLoading, 
-        posts,
-        layout
+        posts
     } = context;
     const {
-        edits,
         index,
     } = attributes;
     let {
@@ -45,11 +35,9 @@ export default function Edit({ attributes, context, setAttributes }) {
         thumbnailSettings,
         titleSettings
     } = templatePostSettings;
-    const isInitialMount = useRef(true);
-    const [post, setPost] = useState(posts[index]);
+    const [post] = useState(posts[index]);
     const {
         date,
-        id,
         excerpt: { rendered: excerpt },
         title: { raw: title }
     } = post;
@@ -82,69 +70,20 @@ export default function Edit({ attributes, context, setAttributes }) {
         return document.body.textContent || document.body.innerText || '';
     }, [excerpt]);
 
-    let postSettings = useMemo( () => {
-        return{
-            thumbnailSettings:attributes.thumbnailSettings,
-            metaSettings:attributes.metaSettings,
-            excerptSettings:attributes.excerptSettings,
-            categorySettings:attributes.categorySettings,
-            titleSettings:attributes.titleSettings.fontSize
-        }
-    }, [
-        attributes.thumbnailSettings.show,
-        thumbnailSettings.alignment,
-        thumbnailSettings.size,
-        metaSettings.author.show,
-        metaSettings.author.showIcon,
-        metaSettings.date.show,
-        excerptSettings.show,
-        categorySettings.show,
-        titleSettings.fontSize
-    ]);
-
-    postSettings = {...templatePostSettings, ...postSettings};
-    // useEffect(() => {
-
-    //     let editedPost = posts.filter(post => post.index == index);
-    //     if (editedPost.length > 0) {
-    //         editedPost = editedPost[0];
-    //         setPost({ ...post, ...editedPost });
-    //     }
-
-    //     if (isInitialMount.current) {
-    //         isInitialMount.current = false;
-    //         return;
-    //     }
-
-
-    // }, [title, post.thumbnailSize]);
+    let postSettings = {...templatePostSettings};
 
     if (index == 0) {
-        // console.log(post);
-        // console.log(postSettings);
+        console.log('postSettings',postSettings);
+        console.log('templatePostSettings',templatePostSettings);
     }
 
     let blockProps = useBlockProps({
-        className:`bca-card ${thumbnailSettings.alignment} ${isLoading ? 'is-loading' : ''}`
+        className:`bca-card ${postSettings.thumbnailSettings.alignment} ${isLoading ? 'is-loading' : ''}`
     });
+    
     return (
         <div {...blockProps}>
 
-            <PostEdit
-                postSettings={postSettings}
-                onChange={ ( value, settings ) => {
-                    setAttributes(value);
-                }}
-            />
-            <InspectorControls>
-                <Inspector
-                    layout={layout}
-                    postSettings={postSettings}
-                    onChange={ (value, settings) => {
-                        setAttributes(value);
-                    }}
-                />
-            </InspectorControls>
             <Animate type={`${!isImageLoaded || isLoading ? 'loading' : ''}`}>
                 {({ className }) => (
                     <Fragment>

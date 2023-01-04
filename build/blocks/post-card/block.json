@@ -57,23 +57,14 @@
   },
   "supports": {
     "anchor": true,
-    "align": true,
     "className": true,
-    "color": {
-      "background": true,
-      "link": true,
-      "text": true
-    },
-    "html": false,
-    "spacing": {
-      "margin": true,
-      "padding": true,
-      "blockGap": true
-    }
+    "html": false
   },
   "usesContext": [
     "bca-template-builder/query",
     "bca-template-builder/postSettings",
+    "bca-template-builder/post",
+    "bca-template-builder/textAlignment",
     "posts",
     "isLoading",
     "layout"

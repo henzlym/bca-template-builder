@@ -45,3 +45,6 @@ export function getCategories(post){
         return term.name;
     })
 }
+export function arrayRemoveDuplicates( array ){
+    return [...new Set(array)]
+}

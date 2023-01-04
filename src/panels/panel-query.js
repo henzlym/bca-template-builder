@@ -3,10 +3,10 @@
  *
  */
  import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useDebounce } from '@wordpress/compose'; 
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
@@ -70,7 +70,7 @@ function PostTypeSelectControl({ value, onChange }){
         
 		return filteredPostTypes;
 	}, [] );
-console.log(postTypes);
+
     if (!postTypes || postTypes.length == 0) {
         return null;
     }
@@ -101,6 +101,8 @@ export default function PanelQuery({ attributes, setAttributes }) {
         types 
     } = query;
 
+    const { __unstableMarkNextChangeAsNotPersistent } = useDispatch( blockEditorStore );
+        
     return(
         <Panel>
             <PanelBody title="Filtering/Sorting settings:" initialOpen={false}>
@@ -138,13 +140,17 @@ export default function PanelQuery({ attributes, setAttributes }) {
                     type="number"
                     label="Number of posts"
                     value={ per_page }
-                    onChange={ ( per_page ) => setAttributes({ query:{ ...query, per_page:per_page } }) }
+                    onChange={ ( per_page ) => {
+                        setAttributes({ query:{ ...query, per_page:per_page } })
+                    } }
                 />
                 <TextControl
                     type="number"
                     label="Offset"
                     value={ offset }
-                    onChange={ ( offset ) => setAttributes({ query:{ ...query, offset:offset } }) }
+                    onChange={ ( offset ) => {
+                        setAttributes({ query:{ ...query, offset:offset } })
+                    } }
                 />
             </PanelBody>
         </Panel>

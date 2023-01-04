@@ -36,7 +36,7 @@
 				},
 				"thumbnailSettings":{
 					"show":true,
-					"alignment":"",
+					"alignment":"left",
 					"size":"thumbnail"
 				}
 			}
@@ -58,6 +58,10 @@
 				"tags":[]
 			}
 		},
+        "queryId":{
+			"type":"string",
+			"default":""
+		},
 		"template":{
 			"type":"string",
 			"default":"1"
@@ -72,13 +76,13 @@
 		},
 		"textAlignment":{
 			"type":"string",
-			"default":""
+			"default":"left"
 		}
 	},
 	"providesContext": {
 		"bca-template-builder/query": "query",
-		"bca-template-builder/postSettings": "postSettings"
-	},
+		"bca-template-builder/postSettings": "postSettings"	
+    },
 	"supports": {
 		"anchor":true,
 		"align": true,
