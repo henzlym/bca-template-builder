@@ -32,6 +32,7 @@ export default function Edit( props ) {
         categorySettings,
         excerptSettings,
         metaSettings,
+        readMoreSettings,
         thumbnailSettings,
         titleSettings
     } = templatePostSettings;
@@ -135,6 +136,9 @@ export default function Edit( props ) {
                                 </div>
                                 {excerptSettings.show && (
                                     <div className='bca-card_excerpt'>{strippedExcerpt}</div>
+                                )}
+                                {readMoreSettings.show && (
+                                    <div className='bca-card_read_more'>Read More</div>
                                 )}
                             </Fragment>
                         )}

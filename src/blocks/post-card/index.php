@@ -18,77 +18,87 @@ add_action( 'init', 'bca_post_card_init' );
 
 function bca_post_card_render( $attributes, $content, $block )
 {
-    global $post;
-    
-    $metadata = wp_json_file_decode( BCA_TEMPLATE_BUILDER_PATH . '/build/blocks/post-card/block.json', array( 'associative' => true ) );
+    $metadata = json_decode(file_get_contents( BCA_TEMPLATE_BUILDER_PATH . '/build/blocks/post-card/block.json' ), true);
     if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 		return [];
 	}
     
     $post_settings = ( isset( $block->context['bca-template-builder/postSettings'] ) && ! empty( $block->context['bca-template-builder/postSettings'] ) ) ? $block->context['bca-template-builder/postSettings'] : [];
-    $text_alignment = ( isset( $block->context['bca-template-builder/textAlignment'] ) && ! empty( $block->context['bca-template-builder/textAlignment'] ) ) ? $block->context['bca-template-builder/textAlignment'] : "left";
-
-    $thumbnail_attrs = array(
-        'class' => 'bca-card_thumbnail'
+    $post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
+    $style_variables = array(
+        '--title-font-size' => $post_settings['titleSettings']['fontSize']
     );
-    do_action( 'qm/debug', [$post->ID, $block->context] );
-
+    
+    $styles = bca_build_attributes( $style_variables, ':', false );
+    
     $classes = implode(
         ' ',
         array(
-            $text_alignment
+            $post_classes,
+            'bca-card',
+            $post_settings['thumbnailSettings']['alignment']
         )
     );
-    remove_filter( 'the_content', 'wpautop' );
+    $attributes = array(
+        'class' => $classes,
+        'style' => $styles
+    );
 
-    return sprintf(
-		'<div class="bca-card %6$s">
+    $attributes = bca_build_attributes($attributes);
+    
+    // Build post card componetns like title, thumbnail and excerpt
+    $title = sprintf(
+        '<h2 class="bca-card_title"><a href="%2$s">%1$s</a></h2>',
+        get_the_title(),
+        get_the_permalink()
+    );
+    
+    $thumbnail_attrs = array(
+        'class' => 'bca-card_thumbnail'
+    );
+    $thumbnail = sprintf(
+        '<a href="%1$s" class="bca-card_thumbnail_container" rel="bookmark">%2$s</a>',
+        esc_url(get_the_permalink()),
+        get_the_post_thumbnail( null, $post_settings['thumbnailSettings']['size'], $thumbnail_attrs )
+    );
+    
+    $categories = sprintf(
+        '<div class="bca-card_categories" rel="categories">%1$s</div>',
+        get_the_category_list( ' ' )
+    );
+    
+    $excerpt = sprintf(
+        '<div class="bca-card_excerpt" rel="excerpt">%1$s</div>',
+        get_the_excerpt()
+    );
+
+    $read_more = sprintf( '<a class="bca-card_readmore" href="%1$s">%2$s</a>',
+        get_permalink( get_the_ID() ),
+        __( 'Read More', 'textdomain' )
+    );
+    
+    $byline = sprintf( '<div class="bca-card_byline">%1$s</div>',
+        get_the_author()
+    );
+    $content = sprintf(
+		'<article %7$s>
             %1$s
             <div class="bca-card_headline">
                 %2$s
                 %3$s
                 %4$s
                 %5$s
+                %6$s
             </div>
-        </div>',
-		get_the_post_thumbnail( '', '', $thumbnail_attrs ),
-		get_the_category_list( ' ' ),
-        the_title( '<h2 class="bca-card_title">', '</h2>', false ),
-        '',
-        get_the_excerpt(),
-        $classes
+        </article>',
+		$post_settings['thumbnailSettings']['show'] ? $thumbnail : '',
+		$post_settings['categorySettings']['show'] ? $categories : '',
+        $title,
+        $post_settings['metaSettings']['author']['show'] ? $byline : '',
+        $post_settings['excerptSettings']['show'] ? $excerpt : '',
+        $post_settings['readMoreSettings']['show'] ? $read_more : '',
+        $attributes
 	);
-    add_filter( 'the_content', 'wpautop' );
 
+    return $content;
 }
-
-function bca_card_post_thumbnail_html( $html )
-{
-    $html = sprintf(
-        '<a href="%1s" class="bca-card_thumbnail_container" rel="bookmark">%2s</a>',
-        esc_attr(esc_url(get_permalink())),
-        $html
-    );
-    return $html;
-}
-add_filter('post_thumbnail_html', 'bca_card_post_thumbnail_html', 10, 5);
-
-function bca_card_the_category( $thelist, $separator, $parents )
-{
-    $thelist = sprintf(
-        '<div class="bca-card_categories" rel="categories">%1s</div>',
-        $thelist
-    );
-    return $thelist;
-}
-add_filter( 'the_category', 'bca_card_the_category', 10, 3 );
-
-function bca_card_get_the_excerpt( $post_excerpt, $post )
-{
-    $post_excerpt = sprintf(
-        '<div class="bca-card_excerpt" rel="excerpt">%1s</div>',
-        $post_excerpt
-    );
-    return $post_excerpt;
-}
-add_filter( 'get_the_excerpt', 'bca_card_get_the_excerpt', 10, 3 );

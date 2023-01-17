@@ -19,7 +19,7 @@ import {
 import { ImageSizeSelectControl, FontSizeControl, PostAuthorControls } from '../components';
 
 export default function PostPanel({layout, postSettings, onChange}) {
-    const { categorySettings, excerptSettings, metaSettings, titleSettings, thumbnailSettings } = postSettings
+    const { categorySettings, excerptSettings, metaSettings, readMoreSettings, titleSettings, thumbnailSettings } = postSettings
     return (
         <Panel>
             <PanelBody title="Post thumbnail settings:" initialOpen={false} >
@@ -85,6 +85,13 @@ export default function PostPanel({layout, postSettings, onChange}) {
                     checked={categorySettings.show}
                     onChange={(value) => {
                         onChange({ categorySettings:{...categorySettings,...{show:value}} });
+                    }}
+                />
+                <ToggleControl
+                    label="Display read more"
+                    checked={readMoreSettings.show}
+                    onChange={(value) => {
+                        onChange({ readMoreSettings:{...readMoreSettings,...{show:value}} });
                     }}
                 />
             </PanelBody>

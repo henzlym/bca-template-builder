@@ -31,6 +31,7 @@
 		.columns-#{$i} {
 			display: grid;
 			grid-template-columns: repeat( #{$i}, minmax(auto, 1fr) );
+            grid-column-gap: var(--grid-column-gap);
 		}
 	}
 }

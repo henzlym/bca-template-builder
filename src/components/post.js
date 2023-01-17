@@ -154,6 +154,9 @@ export default function Post({ attributes, index, isLoading, post:initialPost, s
                                 {postSettings.showExcerpt && (
                                     <div className='bca-card_excerpt'>{strippedExcerpt}</div>
                                 )}
+                                {postSettings.readMoreSettings && (
+                                    <div className='bca-card_read_more'>Read More</div>
+                                )}
                             </Fragment>
                         )}
 

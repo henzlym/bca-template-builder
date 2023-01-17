@@ -5,7 +5,7 @@
  * Description:       Template Builder using gutenberg blocks.
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           1.0.0
+ * Version:           1.1.0
  * Author:            Henzly Meghie
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -13,8 +13,12 @@
  *
  * @package           create-block
  */
+$bca_styles = array();
 define('BCA_TEMPLATE_BUILDER_URL', plugin_dir_url( __FILE__ ) );
 define('BCA_TEMPLATE_BUILDER_PATH', plugin_dir_path( __FILE__ ) );
+
+require_once plugin_dir_path(__FILE__) . './src/helpers.php';
+
 // Include Neset Blocks
 require_once plugin_dir_path(__FILE__) . './src/blocks/post-card/index.php';
 /**
@@ -72,7 +76,7 @@ function bca_get_post_query( $request )
     $blocks_found = __get_blocks( 'bca/template-builder', $request['id'] );
     if (!is_array($blocks_found)||empty($blocks_found)) return $blocks_found;
     
-    $metadata = wp_json_file_decode( __DIR__ . '/build/block.json', array( 'associative' => true ) );
+    $metadata = json_decode(file_get_contents( BCA_TEMPLATE_BUILDER_PATH . '/build/block.json' ), true);
     if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 		return [];
 	}
@@ -106,9 +110,8 @@ function bca_get_post_query( $request )
 
 function bca_template_builder_render( $attributes, $content, $block )
 {
-    global $post;
     $content = "";
-    $metadata = wp_json_file_decode( __DIR__ . '/build/block.json', array( 'associative' => true ) );
+    $metadata = json_decode(file_get_contents( BCA_TEMPLATE_BUILDER_PATH . '/build/block.json' ), true);
     if ( ! is_array( $metadata ) || empty( $metadata['name'] ) ) {
 		return [];
 	}
@@ -116,7 +119,11 @@ function bca_template_builder_render( $attributes, $content, $block )
     $template = ( isset( $attributes['template'] ) ) ? $attributes['template'] : $metadata['attributes']['template']['default'];
     $text_alignment = ( isset( $attributes['textAlignment'] ) ) ? $attributes['textAlignment'] : $metadata['attributes']['textAlignment']['default'];
     $layout = ( isset( $attributes['layout'] ) ) ? $attributes['layout'] : $metadata['attributes']['layout']['default'];
+    $columns = ( isset( $attributes['columns'] ) ) ? $attributes['columns'] : $metadata['attributes']['columns']['default'];
+    $gridGap = ( isset( $attributes['gridGap'] ) ) ? $attributes['gridGap'] : $metadata['attributes']['gridGap']['default'];
+    $gridGap = ( isset( $attributes['gridGap'] ) ) ? $attributes['gridGap'] : $metadata['attributes']['gridGap']['default'];
 
+    $layout = ( $layout == 'columns' ) ? $layout . '-' . $columns : $layout;
     $default_query = $metadata['attributes']['query']['default'];
     $default_post_settings = $metadata['attributes']['postSettings']['default'];
     $post_settings = ( isset( $attributes['postSettings'] ) ) ? $attributes['postSettings'] : $default_post_settings;
@@ -127,13 +134,15 @@ function bca_template_builder_render( $attributes, $content, $block )
     unset( $query_args['types'] );
 
     $query = new WP_Query( $query_args );
-    // do_action( 'qm/debug', [$attributes, $content, $block] );
+    
+    // do_action( 'qm/debug', [$block] );
 
     if ( ! $query->have_posts() ) {
 		return '';
 	}
     
     $inner_blocks_count = 0;
+    $posts = array();
     while ( $query->have_posts() ) {
 		$query->the_post();
 
@@ -143,8 +152,7 @@ function bca_template_builder_render( $attributes, $content, $block )
 		// Set the block name to one that does not correspond to an existing registered block.
 		// This ensures that for the inner instances of the Post Template block, we do not render any block supports.
 		$block_instance['blockName'] = $block_instance['blockName'];
-
-
+        $index = $block_instance['attrs']['index'];
 		// Render the inner blocks of the Post Template block with `dynamic` set to `false` to prevent calling
 		// `render_callback` and ensure that no wrapper markup is included.
 		$block_content = (
@@ -156,15 +164,15 @@ function bca_template_builder_render( $attributes, $content, $block )
 				)
 			)
 		)->render();
-        // do_action( 'qm/debug', [$block_instance, $block_content] );
 
         $inner_blocks_count++;
 		
         // Wrap the render inner blocks in a `li` element with the appropriate post classes.
-		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
-		$content     .= $block_content;
+        $posts[$index] = $block_content;
 	}
     
+    ksort($posts);
+
     wp_reset_postdata();
     
     $classes = implode(
@@ -175,10 +183,22 @@ function bca_template_builder_render( $attributes, $content, $block )
             $layout
         )
     );
+    $style_variables = array(
+        '--grid-column-gap' => $gridGap . 'px',
+    );
+    $styles = bca_build_attributes( $style_variables, ':', false );
+    $attributes = array(
+        'class' => $classes,
+        'style' => $styles,
+    );
+
+    $attributes = bca_build_attributes($attributes);
+
+
     return sprintf(
-		'<div class="wp-block-bca-template-builder"><div class="%1$s">%2$s</div></div>',
-		$classes,
-		$content
+		'<div class="wp-block-bca-template-builder"><div %1$s>%2$s</div></div>',
+		$attributes,
+		implode( " ", $posts )
 	);
     
     return $content;

@@ -21,6 +21,9 @@
 				"excerptSettings":{
 					"show":true
 				},
+                "readMoreSettings":{
+					"show":true
+				},
 				"metaSettings":{
 					"author":{
 						"show":true,
