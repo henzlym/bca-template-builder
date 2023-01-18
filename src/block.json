@@ -56,7 +56,7 @@
 				"order":"desc",
 				"orderby":"date",
 				"per_page":4,
-				"types":"posts",
+				"types":"post",
 				"categories":[],
 				"tags":[]
 			}

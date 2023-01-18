@@ -73,11 +73,6 @@ export default function Edit( props ) {
 
     let postSettings = {...templatePostSettings};
 
-    if (index == 0) {
-        console.log('postSettings',postSettings);
-        console.log('templatePostSettings',templatePostSettings);
-    }
-
     let blockProps = useBlockProps({
         className:`bca-card ${postSettings.thumbnailSettings.alignment} ${isLoading ? 'is-loading' : ''}`
     });

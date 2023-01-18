@@ -67,10 +67,10 @@ function bca_post_card_render( $attributes, $content, $block )
         get_the_category_list( ' ' )
     );
     
-    $excerpt = sprintf(
+    $excerpt = has_excerpt() ? sprintf(
         '<div class="bca-card_excerpt" rel="excerpt">%1$s</div>',
         get_the_excerpt()
-    );
+    ) : '';
 
     $read_more = sprintf( '<a class="bca-card_readmore" href="%1$s">%2$s</a>',
         get_permalink( get_the_ID() ),

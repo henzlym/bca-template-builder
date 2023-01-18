@@ -16,15 +16,6 @@ import {
 
 const ALLOWED_BLOCKS = ['bca/post-card'];
 
-function Posts({ className, style, Template }) {
-    const innerBlocksProps = useInnerBlocksProps({ className: `${className}`, style }, {
-        allowedBlocks: ALLOWED_BLOCKS,
-        template: Template,
-        templateLock: 'insert',
-    });
-    return <div {...innerBlocksProps} />
-}
-
 export default function Template({ attributes, posts, isLoading, setAttributes }) {
 
     const { columns, gridGap, layout, postSettings, query: { per_page }, template, textAlignment } = attributes;
@@ -48,6 +39,16 @@ export default function Template({ attributes, posts, isLoading, setAttributes }
     let Template = posts.map((post, index) => {
         return [ 'bca/post-card', { index: index } ];
     })
+    
+    const Posts = ({ className, style, Template }) => {
+        const innerBlocksProps = useInnerBlocksProps({ className: `${className}`, style }, {
+            allowedBlocks: ALLOWED_BLOCKS,
+            template: Template,
+            templateLock: 'insert',
+        });
+        return <div {...innerBlocksProps} />
+    }
+    
     return (
         <BlockContextProvider
             value={{ posts: posts, isLoading:isLoading, layout:layout }}

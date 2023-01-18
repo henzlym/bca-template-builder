@@ -5,7 +5,7 @@
  * Description:       Template Builder using gutenberg blocks.
  * Requires at least: 5.8
  * Requires PHP:      7.0
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            Henzly Meghie
  * License:           GPL-2.0-or-later
  * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
@@ -129,14 +129,14 @@ function bca_template_builder_render( $attributes, $content, $block )
     $post_settings = ( isset( $attributes['postSettings'] ) ) ? $attributes['postSettings'] : $default_post_settings;
     $query_args = ( isset( $attributes['query'] ) ) ? $attributes['query'] : $default_query;
     $query_args['posts_per_page'] = $query_args['per_page'];
+    $query_args['post_type'] = $query_args['types'];
+    
     unset( $query_args['per_page'] );
     unset( $query_args['_embed'] );
     unset( $query_args['types'] );
 
     $query = new WP_Query( $query_args );
     
-    // do_action( 'qm/debug', [$block] );
-
     if ( ! $query->have_posts() ) {
 		return '';
 	}

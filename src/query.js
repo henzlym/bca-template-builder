@@ -41,12 +41,10 @@ export default function PostQuery({ attributes, clientId, setAttributes }) {
             _embed,
             per_page,
             order,
-            orderby,
+            orderby
         }
 
-
-        const entities = select(core).getEntityRecords('postType', 'post', postQuery) || [];
-
+        const entities = select(core).getEntityRecords('postType', types, postQuery) || [];
         return { posts: entities }
 
     }, [

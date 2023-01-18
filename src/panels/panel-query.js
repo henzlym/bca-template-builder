@@ -108,8 +108,8 @@ export default function PanelQuery({ attributes, setAttributes }) {
             <PanelBody title="Filtering/Sorting settings:" initialOpen={false}>
                 <PostTypeSelectControl
                     value={types}
-                    onChange={ (type) => {
-                        setAttributes({ query:{ ...query, types:type } })
+                    onChange={ (type) => { 
+                        setAttributes({ query:{ ...query, types:type, categories:[], tags:[] } })
                     }}
                 />
                 <OrderControl
