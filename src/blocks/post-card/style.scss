@@ -4,7 +4,7 @@
 		margin-bottom: 15px;
 		&.left {
 			display: grid;
-			grid-template-columns: minmax(33.333%, auto) minmax(auto, 1fr);
+			grid-template-columns: minmax(auto, 33.333%) minmax(auto, 1fr);
 			grid-column-gap: 15px;
 		}
 		&.right {
