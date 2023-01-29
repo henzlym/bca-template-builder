@@ -40,7 +40,7 @@ export default function Template({ attributes, posts, isLoading, setAttributes }
         return [ 'bca/post-card', { index: index } ];
     })
     
-    const Posts = ({ className, style, Template }) => {
+    function Posts ({ className, style, Template }) {
         const innerBlocksProps = useInnerBlocksProps({ className: `${className}`, style }, {
             allowedBlocks: ALLOWED_BLOCKS,
             template: Template,
@@ -48,7 +48,7 @@ export default function Template({ attributes, posts, isLoading, setAttributes }
         });
         return <div {...innerBlocksProps} />
     }
-    
+
     return (
         <BlockContextProvider
             value={{ posts: posts, isLoading:isLoading, layout:layout }}

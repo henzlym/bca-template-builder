@@ -2,12 +2,12 @@
  * Wordpress dependecies.
  *
  */
- import { __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useDebounce } from '@wordpress/compose'; 
+import { useDebounce } from '@wordpress/compose';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { addQueryArgs } from '@wordpress/url';
 import {
@@ -28,48 +28,48 @@ import {
 import { TermsControl } from '../components';
 
 const orderOptions = [
-	{
-		label: __( 'Newest to oldest' ),
-		value: 'date/desc',
-	},
-	{
-		label: __( 'Oldest to newest' ),
-		value: 'date/asc',
-	},
-	{
-		/* translators: label for ordering posts by title in ascending order */
-		label: __( 'A → Z' ),
-		value: 'title/asc',
-	},
-	{
-		/* translators: label for ordering posts by title in descending order */
-		label: __( 'Z → A' ),
-		value: 'title/desc',
-	},
+    {
+        label: __('Newest to oldest'),
+        value: 'date/desc',
+    },
+    {
+        label: __('Oldest to newest'),
+        value: 'date/asc',
+    },
+    {
+        /* translators: label for ordering posts by title in ascending order */
+        label: __('A → Z'),
+        value: 'title/asc',
+    },
+    {
+        /* translators: label for ordering posts by title in descending order */
+        label: __('Z → A'),
+        value: 'title/desc',
+    },
 ];
-function OrderControl( { order, orderBy, onChange } ) {
-	return (
-		<SelectControl
-			label={ __( 'Order by' ) }
-			value={ `${ orderBy }/${ order }` }
-			options={ orderOptions }
-			onChange={ onChange }
-		/>
-	);
+function OrderControl({ order, orderBy, onChange }) {
+    return (
+        <SelectControl
+            label={__('Order by')}
+            value={`${orderBy}/${order}`}
+            options={orderOptions}
+            onChange={onChange}
+        />
+    );
 }
 
-function PostTypeSelectControl({ value, onChange }){
-    
-    const postTypes = useSelect( ( select ) => {
-		const { getPostTypes } = select( coreStore );
-		const excludedPostTypes = [ 'attachment' ];
-		const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
-			( { viewable, slug } ) =>
-				viewable && ! excludedPostTypes.includes( slug )
-		);
-        
-		return filteredPostTypes;
-	}, [] );
+function PostTypeSelectControl({ value, onChange }) {
+
+    const postTypes = useSelect((select) => {
+        const { getPostTypes } = select(coreStore);
+        const excludedPostTypes = ['attachment'];
+        const filteredPostTypes = getPostTypes({ per_page: -1 })?.filter(
+            ({ viewable, slug }) =>
+                viewable && !excludedPostTypes.includes(slug)
+        );
+
+        return filteredPostTypes;
+    }, []);
 
     if (!postTypes || postTypes.length == 0) {
         return null;
@@ -79,78 +79,78 @@ function PostTypeSelectControl({ value, onChange }){
         return { label: postType.labels.singular_name, value: postType.slug }
     });
 
-    return(
+    return (
         <SelectControl
             label="Post type"
-            value={ value }
-            options={ postTypeOptions }
-            onChange={ onChange }
+            value={value}
+            options={postTypeOptions}
+            onChange={onChange}
             __nextHasNoMarginBottom
         />
     )
 }
 export default function PanelQuery({ attributes, setAttributes }) {
     const { query } = attributes;
-    const { 
+    const {
         categories,
-		tags,
-        per_page, 
-        offset, 
-        order, 
-        orderby, 
-        types 
+        tags,
+        per_page,
+        offset,
+        order,
+        orderby,
+        types
     } = query;
 
-    const { __unstableMarkNextChangeAsNotPersistent } = useDispatch( blockEditorStore );
-        
-    return(
+    const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(blockEditorStore);
+
+    return (
         <Panel>
             <PanelBody title="Filtering/Sorting settings:" initialOpen={false}>
                 <PostTypeSelectControl
                     value={types}
-                    onChange={ (type) => { 
-                        setAttributes({ query:{ ...query, types:type, categories:[], tags:[] } })
+                    onChange={(type) => {
+                        setAttributes({ query: { ...query, types: type, categories: [], tags: [] } })
                     }}
                 />
                 <OrderControl
                     order={order}
-                    orderby={orderby}
-                    onChange={ ( value ) => {
-                        const [ newOrderBy, newOrder ] = value.split( '/' );
-                        setAttributes({ query:{ ...query, order: newOrder, orderBy: newOrderBy } });
+                    orderBy={orderby}
+                    onChange={(value) => {
+                        const [newOrderBy, newOrder] = value.split('/');
+                        setAttributes({ query: { ...query, order: newOrder, orderby: newOrderBy } });
                     }}
                 />
                 <TermsControl
                     label={'Categories'}
                     taxonomy={'categories'}
                     value={categories}
-                    onChange={ ( tokens ) => {
-                        setAttributes({ query:{ ...query, categories: tokens } });
+                    onChange={(tokens) => {
+                        setAttributes({ query: { ...query, categories: tokens } });
                     }}
                 />
                 <TermsControl
                     label={'Tags'}
                     taxonomy={'tags'}
                     value={tags}
-                    onChange={ ( tokens ) => {
-                        setAttributes({ query:{ ...query, tags: tokens } });
+                    onChange={(tokens) => {
+                        setAttributes({ query: { ...query, tags: tokens } });
                     }}
                 />
                 <TextControl
                     type="number"
                     label="Number of posts"
-                    value={ per_page }
-                    onChange={ ( per_page ) => {
-                        setAttributes({ query:{ ...query, per_page:per_page } })
-                    } }
+                    value={per_page}
+                    onChange={(per_page) => {
+                        setAttributes({ query: { ...query, per_page: per_page } })
+                    }}
                 />
                 <TextControl
                     type="number"
                     label="Offset"
-                    value={ offset }
-                    onChange={ ( offset ) => {
-                        setAttributes({ query:{ ...query, offset:offset } })
-                    } }
+                    value={offset}
+                    onChange={(offset) => {
+                        setAttributes({ query: { ...query, offset: offset } })
+                    }}
                 />
             </PanelBody>
         </Panel>

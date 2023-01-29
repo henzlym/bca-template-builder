@@ -3,7 +3,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { get } from 'lodash';
 
 export function restApiFetch(url, query = {}, callback = null) {
-    console.log(callback);
+
     if (callback == null || typeof callback !== 'function') {
         return false;
     }
@@ -19,7 +19,7 @@ export function restApiFetch(url, query = {}, callback = null) {
 }
 
 export function getAuthor (post){
-    const author = (typeof post._embedded['author'] !== 'undefined') ? post._embedded['author']['0'] : false;
+    const author = get(post, '_embedded.author.0', false);
     if (author !== false) {
         author.avatar = false;
         if (typeof post._embedded['author']['0'].avatar_urls['48'] !== 'undefined') {
@@ -33,18 +33,35 @@ export function getAuthor (post){
     return author;
 };
 export function getThumbnail(post, size = 'thumbnail'){
-    const image = (typeof post._embedded['wp:featuredmedia'] !== 'undefined') ? post._embedded['wp:featuredmedia']['0'] : false;
-    if (!image) return image;
-    return get(image, ['media_details', 'sizes', size, 'source_url']);
+    return get(post, '_embedded.wp:featuredmedia.0.media_details.sizes.' + size + '.source_url', false);
 }
 
 export function getCategories(post){
-    const terms = (typeof post._embedded['wp:term'] !== 'undefined') ? post._embedded['wp:term']['0'] : false;
+    const terms = get(post, '_embedded.wp:term.0', false);
     if (!terms) return terms;
     return terms.map((term) => {
         return term.name;
     })
 }
+export function getExcerpt(post){
+    let excerpt = get( post, 'excerpt.rendered', '');
+    if (!excerpt) return '';
+    return decodeHTMLEntities( excerpt );
+}
+export function getTitle(post){
+    let title = get(post, 'title.raw', '');
+    return decodeHTMLEntities( title );
+}
+export function getDate(post){
+    return get(post, 'date', '');
+}
 export function arrayRemoveDuplicates( array ){
     return [...new Set(array)]
+}
+function decodeHTMLEntities(str) {
+    let document = new window.DOMParser().parseFromString(
+        str,
+        'text/html'
+    );
+    return document.body.textContent || document.body.innerText || '';
 }

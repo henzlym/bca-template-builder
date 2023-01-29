@@ -69,7 +69,7 @@ export default function Edit( props ) {
 	const [selectedPost, setSelectedPost] = useState(false);
 	const { attributes, clientId, setAttributes } = props;
 
-	return (
+    return (
 		<div { ...useBlockProps() }>
             <Inspector { ...{attributes, clientId, setAttributes} } />
             <PostQuery { ...{attributes, clientId, setAttributes} }/>

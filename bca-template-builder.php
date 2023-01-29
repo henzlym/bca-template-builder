@@ -148,7 +148,21 @@ function bca_template_builder_render( $attributes, $content, $block )
 
 		// Get an instance of the current Post Template block.
 		$block_instance = $block->parsed_block;
-        $block_instance = $block_instance['innerBlocks'][$inner_blocks_count];
+        do_action( 'qm/debug', $block_instance['innerBlocks'] );
+        if (isset($block_instance['innerBlocks']) && !empty($block_instance['innerBlocks'])) {
+            $block_instance = $block_instance['innerBlocks'][$inner_blocks_count];
+        } else {
+            $block_instance = array(
+                "blockName" => "bca/post-card",
+                "attrs" => array(
+                    "index" => $inner_blocks_count
+                ),
+                "innerBlocks" => array(),
+                "innerHTML" => "",
+                "innerContent" => array()
+            );
+        }
+
 		// Set the block name to one that does not correspond to an existing registered block.
 		// This ensures that for the inner instances of the Post Template block, we do not render any block supports.
 		$block_instance['blockName'] = $block_instance['blockName'];
