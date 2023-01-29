@@ -37,7 +37,7 @@ export default function PostQuery({ attributes, clientId, setAttributes }) {
     // State variable to track if the data is currently loading.
     let isLoading = false;
     // Destructuring the attributes object to make it easier to work with.
-    let { layout, query, template, textAlignment } = attributes;
+    let { columns, gridGap, layout, query, template, textAlignment } = attributes;
     // Destructuring the query object to make it easier to work with.
     let { categories, _embed, per_page, tags, types, offset, order, orderby } = query;
     // Use the useSelect hook to fetch post data from the WordPress API based on the parameters passed in attributes.query.
@@ -90,7 +90,7 @@ export default function PostQuery({ attributes, clientId, setAttributes }) {
         
     // Return a div element with the class name derived from above and the component iterates through the post data and renders a Post component for each post, passing in attributes, isLoading, and post as props.
     return (
-        <div className={classes}>
+        <div className={classes} style={{ gridColumnGap: gridGap }}>
             {posts.map((post) => {
                 return <Post {...{attributes, isLoading, post}}/>
             })}
