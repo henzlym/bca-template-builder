@@ -208,9 +208,10 @@ function bca_template_builder_render( $attributes, $content, $block )
 
     $attributes = bca_build_attributes($attributes);
 
-
+    $block_attributes = get_block_wrapper_attributes();
     return sprintf(
-		'<div class="wp-block-bca-template-builder"><div %1$s>%2$s</div></div>',
+		'<div %1$s><div %2$s>%3$s</div></div>',
+        $block_attributes,
 		$attributes,
 		implode( " ", $posts )
 	);
