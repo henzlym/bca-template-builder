@@ -30,8 +30,10 @@
 	@for $i from 1 through 4 {
 		.columns-#{$i} {
 			display: grid;
-			grid-template-columns: repeat( #{$i}, minmax(auto, 1fr) );
             grid-column-gap: var(--grid-column-gap);
+            @media screen and (min-width:768px) {
+                grid-template-columns: repeat( #{$i}, minmax(auto, 1fr) );
+            }
 		}
 	}
 }
